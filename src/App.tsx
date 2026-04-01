@@ -10,7 +10,8 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import { format } from 'date-fns';
 import { 
   Package, Plus, QrCode, LogOut, ArrowLeft, 
-  AlertTriangle, History, Save, Edit, RefreshCw, Settings
+  AlertTriangle, History, Save, Edit, RefreshCw, Settings, BookOpen,
+  ArrowDownToLine, ArrowUpFromLine, ShieldAlert, Calendar, Printer, Smartphone
 } from 'lucide-react';
 
 // --- Types ---
@@ -41,7 +42,7 @@ interface InventoryLog {
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<'dashboard' | 'register' | 'scan' | 'partDetails'>('dashboard');
+  const [view, setView] = useState<'dashboard' | 'register' | 'scan' | 'partDetails' | 'manual'>('dashboard');
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null);
   const [firebaseConfigured, setFirebaseConfigured] = useState(true);
 
@@ -160,6 +161,13 @@ export default function App() {
             <span className="font-bold text-lg hidden sm:block">HVAC Inventory</span>
           </div>
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => setView('manual')}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <BookOpen className="w-5 h-5" />
+              <span className="hidden sm:block text-sm font-medium">매뉴얼</span>
+            </button>
             <span className="text-sm text-gray-600 hidden sm:block">{user.email}</span>
             <button 
               onClick={handleLogout}
@@ -196,7 +204,180 @@ export default function App() {
             onBack={() => { setView('dashboard'); setSelectedPartId(null); }} 
           />
         )}
+        {view === 'manual' && (
+          <Manual onBack={() => setView('dashboard')} />
+        )}
       </main>
+    </div>
+  );
+}
+
+// --- Manual Component ---
+function Manual({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="max-w-5xl mx-auto pb-12">
+      <button onClick={onBack} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors">
+        <ArrowLeft className="w-4 h-4" /> 대시보드로 돌아가기
+      </button>
+
+      <div className="space-y-8">
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-8 sm:p-10 text-white shadow-lg relative overflow-hidden">
+          <div className="relative z-10">
+            <h2 className="text-3xl font-bold mb-4 flex items-center gap-3">
+              <BookOpen className="w-8 h-8" />
+              HVAC 재고 관리 시스템 가이드
+            </h2>
+            <p className="text-blue-100 text-lg max-w-2xl leading-relaxed">
+              QR 코드를 활용하여 쉽고 빠르게 재고를 관리하세요. 핵심 기능과 사용 흐름을 한눈에 파악할 수 있습니다.
+            </p>
+          </div>
+          <Package className="absolute -right-10 -bottom-10 w-64 h-64 text-blue-500 opacity-20 pointer-events-none" />
+        </div>
+
+        {/* Workflow / Quick Start */}
+        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
+          <h3 className="text-xl font-bold text-gray-900 mb-8 flex items-center gap-2">
+            <span className="text-2xl">🚀</span> 기본 사용 흐름
+          </h3>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 relative">
+            {/* Step 1 */}
+            <div className="flex flex-col items-center text-center relative z-10">
+              <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-blue-100">
+                <Plus className="w-8 h-8" />
+              </div>
+              <h4 className="font-bold text-gray-900 mb-2">1. 부품 등록</h4>
+              <p className="text-sm text-gray-500 leading-relaxed">신규 부품 정보와 기초 재고를 시스템에 등록합니다.</p>
+            </div>
+            
+            {/* Step 2 */}
+            <div className="flex flex-col items-center text-center relative z-10">
+              <div className="w-16 h-16 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-purple-100">
+                <Printer className="w-8 h-8" />
+              </div>
+              <h4 className="font-bold text-gray-900 mb-2">2. QR 출력 및 부착</h4>
+              <p className="text-sm text-gray-500 leading-relaxed">생성된 QR 코드를 라벨로 출력하여 부품함에 부착합니다.</p>
+            </div>
+            
+            {/* Step 3 */}
+            <div className="flex flex-col items-center text-center relative z-10">
+              <div className="w-16 h-16 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-orange-100">
+                <Smartphone className="w-8 h-8" />
+              </div>
+              <h4 className="font-bold text-gray-900 mb-2">3. QR 스캔</h4>
+              <p className="text-sm text-gray-500 leading-relaxed">입/출고 시 스마트폰이나 태블릿 카메라로 QR을 스캔합니다.</p>
+            </div>
+            
+            {/* Step 4 */}
+            <div className="flex flex-col items-center text-center relative z-10">
+              <div className="w-16 h-16 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-green-100">
+                <ArrowDownToLine className="w-8 h-8" />
+              </div>
+              <h4 className="font-bold text-gray-900 mb-2">4. 입고/출고 처리</h4>
+              <p className="text-sm text-gray-500 leading-relaxed">수량을 입력하여 빠르고 정확하게 재고를 갱신합니다.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Detailed Features Grid */}
+        <div className="pt-4">
+          <h3 className="text-xl font-bold text-gray-900 mb-6 px-2 flex items-center gap-2">
+            <span className="text-2xl">💡</span> 주요 기능 상세 안내
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            {/* Card 1: In/Out */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-4 mb-5">
+                <div className="p-3 bg-green-100 text-green-700 rounded-xl">
+                  <Package className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-bold text-gray-900">입고 및 출고 처리</h4>
+              </div>
+              <div className="space-y-4 text-sm text-gray-600">
+                <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
+                  <div className="mt-0.5 p-1.5 bg-white shadow-sm rounded-md text-gray-700"><QrCode className="w-4 h-4"/></div>
+                  <div>
+                    <strong className="text-gray-900 block mb-0.5">QR 스캔 (권장)</strong>
+                    대시보드의 'QR 스캔' 버튼을 눌러 부품을 즉시 찾습니다.
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 bg-green-50 p-3 rounded-lg">
+                  <div className="mt-0.5 p-1.5 bg-white shadow-sm rounded-md text-green-600"><ArrowDownToLine className="w-4 h-4"/></div>
+                  <div>
+                    <strong className="text-green-900 block mb-0.5">입고 (+)</strong>
+                    새로 들어온 부품 수량을 더합니다.
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 bg-blue-50 p-3 rounded-lg">
+                  <div className="mt-0.5 p-1.5 bg-white shadow-sm rounded-md text-blue-600"><ArrowUpFromLine className="w-4 h-4"/></div>
+                  <div>
+                    <strong className="text-blue-900 block mb-0.5">출고 (-)</strong>
+                    사용하거나 반출된 부품 수량을 뺍니다.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Adjustments */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-4 mb-5">
+                <div className="p-3 bg-gray-100 text-gray-700 rounded-xl">
+                  <Edit className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-bold text-gray-900">재고 조정 (실사/로스)</h4>
+              </div>
+              <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                전산 재고와 실제 재고가 다를 때 사용합니다. 파손, 분실, 재고 실사 결과 반영 시 필수적입니다.
+              </p>
+              <ul className="text-sm text-gray-600 space-y-3">
+                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div> 부품 상세 페이지에서 <strong>[재고 조정]</strong> 클릭</li>
+                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div> 증가(+) 또는 감소(-) 선택 후 수량 입력</li>
+                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div> <strong>조정 사유</strong>를 반드시 입력하여 이력에 남김</li>
+              </ul>
+            </div>
+
+            {/* Card 3: Safety Stock */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-4 mb-5">
+                <div className="p-3 bg-red-100 text-red-600 rounded-xl">
+                  <ShieldAlert className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-bold text-gray-900">안전 재고 및 발주 알림</h4>
+              </div>
+              <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                재고 부족으로 인한 업무 차질을 방지합니다.
+              </p>
+              <div className="bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-800 flex gap-3">
+                <AlertTriangle className="w-5 h-5 shrink-0 text-red-600 mt-0.5" />
+                <p className="leading-relaxed">
+                  현재고가 안전재고의 <strong>15% 미만</strong>으로 떨어지면 대시보드에 위험 경고가 표시되며, 리드타임을 고려한 예상 입고일이 안내됩니다.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 4: Rollover */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-4 mb-5">
+                <div className="p-3 bg-indigo-100 text-indigo-600 rounded-xl">
+                  <Calendar className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-bold text-gray-900">월말 마감 및 이월</h4>
+              </div>
+              <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                매월 말, 현재고를 다음 달의 기초 재고로 확정 짓는 작업입니다.
+              </p>
+              <ul className="text-sm text-gray-600 space-y-3 bg-indigo-50/50 p-4 rounded-xl">
+                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div> 대시보드 상단의 <strong>[월말 마감 및 이월]</strong> 버튼 클릭</li>
+                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div> 현재고 스냅샷이 저장되어 월별 재고 추적 가능</li>
+                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div> 월 1회 정기적으로 수행할 것을 권장</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
